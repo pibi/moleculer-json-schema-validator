@@ -4,9 +4,9 @@ const BaseValidator = require('moleculer/src/validator')
 const {ValidationError} = require('moleculer/src/errors')
 
 class AjvValidator extends BaseValidator {
-  constructor () {
+  constructor (options) {
     super()
-    this.validator = new Ajv()
+    this.validator = new Ajv(options)
   }
 
   compile (schema) {
