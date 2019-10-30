@@ -19,6 +19,30 @@ class AjvValidator extends BaseValidator {
     if (isValid) return true
     else throw new ValidationError('Parameters validation error!', null, validate.errors)
   }
+  
+	/**
+	 * Register validator as a middleware
+	 *
+	 * @memberof ParamValidator
+	 */
+	middleware() {
+		return function validatorMiddleware(handler, action) {
+			// Wrap a param validator
+			if (action.params && typeof action.params === "object") {
+				const check = this.compile(action.params);
+				return async function validateContextParams(ctx) {
+					let res = await check(ctx.params != null ? ctx.params : {});
+					if (res === true)
+						return handler(ctx);
+					else {
+						res = res.map(data => Object.assign(data, { nodeID: ctx.nodeID, action: ctx.action.name }));
+						return Promise.reject(new ValidationError("Parameters validation error!", null, res));
+					}
+				};
+			}
+			return handler;
+		}.bind(this);
+	}  
 }
 
 module.exports = AjvValidator
