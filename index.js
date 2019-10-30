@@ -14,8 +14,8 @@ class AjvValidator extends BaseValidator {
     return (params) => this.validate(params, validate)
   }
 
-  validate (params, validate) {
-    const isValid = validate(params)
+  async validate (params, validate) {
+    const isValid = await validate(params)
     if (isValid) return true
     else throw new ValidationError('Parameters validation error!', null, validate.errors)
   }
