@@ -1,6 +1,6 @@
 {
   "name": "moleculer-json-schema-validator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "validate moleculer params by json schema",
   "keywords": [
     "moleculer",
@@ -14,6 +14,6 @@
     "ajv": "^6.x.x"
   },
   "peerDependencies": {
-    "moleculer": "^0.11.x"
+    "moleculer": "^0.13.x"
   }
 }
