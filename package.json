@@ -11,7 +11,8 @@
   "author": "zhaoyao91 <zhaoyao91@163.com>",
   "license": "MIT",
   "dependencies": {
-    "ajv": "^6.x.x"
+    "ajv": "^8.x.x",
+    "ajv-formats": "^2.1.1"
   },
   "peerDependencies": {
     "moleculer": "^0.14.x"

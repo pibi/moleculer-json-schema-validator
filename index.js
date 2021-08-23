@@ -1,12 +1,15 @@
 const Ajv = require('ajv')
+const addFormats = require("ajv-formats")
 
 const BaseValidator = require('moleculer/src/validators/base')
 const {ValidationError} = require('moleculer/src/errors')
 
+// TODO: fallback to default-validator when the schema is not a JSON-schema
 class AjvValidator extends BaseValidator {
   constructor (options) {
     super()
     this.validator = new Ajv(options)
+	addFormats(ajv)
   }
 
   compile (schema) {
