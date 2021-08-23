@@ -9,7 +9,7 @@ class AjvValidator extends BaseValidator {
   constructor (options) {
     super()
     this.validator = new Ajv(options)
-	addFormats(ajv)
+	addFormats(this.validator)
   }
 
   compile (schema) {
@@ -32,6 +32,7 @@ class AjvValidator extends BaseValidator {
 		return function validatorMiddleware(handler, action) {
 			// Wrap a param validator
 			if (action.params && typeof action.params === "object") {
+				if (!action.params.openApi && !action.params.swagger) {	return handler; }
 				const check = this.compile(action.params);
 				return async function validateContextParams(ctx) {
 					let res = await check(ctx.params != null ? ctx.params : {});
