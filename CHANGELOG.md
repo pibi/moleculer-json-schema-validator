@@ -1,8 +1,12 @@
 # Change Log
-## Current Version (v2.1.0)
+## Current Version (v2.2.0)
 
-- using ajv extended formats
-- using [ajv ^8.x.x](https://github.com/epoberezkin/ajv)
+- using [ajv-keywords](https://github.com/ajv-validator/ajv-keywords)
+- ignore invalid schema (TODO: fallback to deafult moleculer validator)
+## Version v2.1.0
+
+- using [ajv-formats](https://github.com/ajv-validator/ajv-formats)
+- using [ajv ^8.x.x](https://github.com/ajv-validator/ajv)
 
 ## Version v2.0.0
 

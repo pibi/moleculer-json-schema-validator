@@ -1,5 +1,6 @@
 const Ajv = require('ajv')
 const addFormats = require("ajv-formats")
+const addKeywords = require("ajv-formats")
 
 const BaseValidator = require('moleculer/src/validators/base')
 const {ValidationError} = require('moleculer/src/errors')
@@ -9,7 +10,8 @@ class AjvValidator extends BaseValidator {
   constructor (options) {
     super()
     this.validator = new Ajv(options)
-	addFormats(this.validator)
+    addFormats(this.validator)
+    addKeywords(this.validator)
   }
 
   compile (schema) {
@@ -32,10 +34,14 @@ class AjvValidator extends BaseValidator {
 		return function validatorMiddleware(handler, action) {
 			// Wrap a param validator
 			if (action.params && typeof action.params === "object") {
-				if (!action.params.openApi && !action.params.swagger) {	return handler; }
-				const check = this.compile(action.params);
+				let checkFn;
+				try {
+					checkFn = this.compile(action.params);
+				} catch (error) {
+					return handler;
+				}
 				return async function validateContextParams(ctx) {
-					let res = await check(ctx.params != null ? ctx.params : {});
+					let res = await checkFn(ctx.params != null ? ctx.params : {});
 					if (res === true)
 						return handler(ctx);
 					else {
