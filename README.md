@@ -25,7 +25,7 @@ module.exports = {
 module.exports = {
   actions: {
     hello: {
-      params: {
+      jsonSchema: {
         properties: {
           "name": {type: "string"}
         },

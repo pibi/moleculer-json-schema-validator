@@ -1,30 +1,30 @@
-const Ajv = require('ajv')
-const addFormats = require("ajv-formats")
-const addKeywords = require("ajv-formats")
+const Ajv = require("ajv");
+const addFormats = require("ajv-formats");
+const addKeywords = require("ajv-keywords");
 
-const BaseValidator = require('moleculer/src/validators/base')
-const {ValidationError} = require('moleculer/src/errors')
+const BaseValidator = require("moleculer/src/validators/base");
+const FallbackValidator = require("moleculer/src/validators/fastest");
+const {ValidationError} = require("moleculer/src/errors");
 
-// TODO: fallback to default-validator when the schema is not a JSON-schema
 class AjvValidator extends BaseValidator {
-  constructor (options) {
-    super()
-    this.validator = new Ajv(options)
-    addFormats(this.validator)
-    addKeywords(this.validator)
-  }
+	constructor (options) {
+		super();
+		this.validator = new Ajv(options);
+		addKeywords(this.validator);
+		addFormats(this.validator);
+		this.fallbackValidator = new FallbackValidator();
+	}
 
-  compile (schema) {
-    const validate = this.validator.compile(schema)
-    return (params) => this.validate(params, validate)
-  }
+	compile (schema) {
+		const validate = this.validator.compile(schema);
+		return (params) => this.validate(params, validate);
+	}
 
-  async validate (params, validate) {
-    const isValid = await validate(params)
-    if (isValid) return true
-    else throw new ValidationError('Parameters validation error!', null, validate.errors)
-  }
-  
+	async validate (params, validate) {
+		const isValid = await validate(params);
+		if (!isValid) throw new ValidationError("Parameters validation error!", null, validate.errors);
+	}
+
 	/**
 	 * Register validator as a middleware
 	 *
@@ -32,27 +32,29 @@ class AjvValidator extends BaseValidator {
 	 */
 	middleware() {
 		return function validatorMiddleware(handler, action) {
-			// Wrap a param validator
-			if (action.params && typeof action.params === "object") {
-				let checkFn;
-				try {
-					checkFn = this.compile(action.params);
-				} catch (error) {
-					return handler;
-				}
+			if (!action.jsonSchema || typeof action.jsonSchema !== "object") {
+
+				// no schema to validate for => just return back the handler directly
+				if (!action.params || typeof action.params !== "object") return handler;
+
+				// fallback to the fastest validator (moleculer's default validator)
+				const checkFn = this.fallbackValidator.compile(action.params);
 				return async function validateContextParams(ctx) {
-					let res = await checkFn(ctx.params != null ? ctx.params : {});
-					if (res === true)
-						return handler(ctx);
-					else {
-						res = res.map(data => Object.assign(data, { nodeID: ctx.nodeID, action: ctx.action.name }));
-						return Promise.reject(new ValidationError("Parameters validation error!", null, res));
-					}
+					const res = await checkFn(ctx.params);
+					if (res !== true)
+						throw new ValidationError("Parameters validation error!", null, res);
+					return handler(ctx);
 				};
 			}
-			return handler;
+
+			// Wrap a param validator when the params are specified
+			const checkFn = this.compile(action.jsonSchema);
+			return async function validateContextParams(ctx) {
+				await checkFn(ctx.params != null ? ctx.params : {});
+				return handler(ctx);
+			};
 		}.bind(this);
-	}  
+	}
 }
 
-module.exports = AjvValidator
+module.exports = AjvValidator;

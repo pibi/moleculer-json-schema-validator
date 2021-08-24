@@ -1,5 +1,14 @@
 # Change Log
-## Current Version (v2.2.0)
+## Current Version (v3.0.0)
+
+- support jsonSchema property in action definition
+- fallback to moleculer's default validator with params
+- code refactory
+- full test coverage
+## Version v2.2.1 (unreleased)
+
+- bugfixes
+## Version v2.2.0
 
 - using [ajv-keywords](https://github.com/ajv-validator/ajv-keywords)
 - ignore invalid schema (TODO: fallback to deafult moleculer validator)
