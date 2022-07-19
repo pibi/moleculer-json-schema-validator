@@ -1,6 +1,6 @@
 {
   "name": "moleculer-json-schema-validator",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "json-schema validator for moleculer",
   "keywords": [
     "moleculer",

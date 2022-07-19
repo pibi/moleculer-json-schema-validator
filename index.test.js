@@ -1,7 +1,6 @@
 "use strict";
 
-const { ServiceBroker } = require("moleculer");
-const { ValidationError } = require("moleculer").Errors;
+const { ServiceBroker, Errors: { ValidationError }} = require("moleculer");
 
 beforeAll(async () => {});
 afterAll(async () => {});

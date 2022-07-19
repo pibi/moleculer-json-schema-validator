@@ -2,17 +2,15 @@ const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
 const addKeywords = require("ajv-keywords");
 
-const BaseValidator = require("moleculer/src/validators/base");
-const FallbackValidator = require("moleculer/src/validators/fastest");
-const {ValidationError} = require("moleculer/src/errors");
+const { Validators, Errors: { ValidationError } } = require("moleculer");
 
-class AjvValidator extends BaseValidator {
-	constructor (options) {
+class AjvValidator extends Validators.Base {
+	constructor (options = {}) {
 		super();
 		this.validator = new Ajv(options);
 		addKeywords(this.validator);
 		addFormats(this.validator);
-		this.fallbackValidator = new FallbackValidator();
+		this.fallbackValidator = new Validators.Fastest();
 	}
 
 	compile (schema) {
